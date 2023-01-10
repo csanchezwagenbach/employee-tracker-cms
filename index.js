@@ -32,6 +32,23 @@ db.query(`SELECT * FROM role`, (req, res) => {
     console.table(res)
 });
 
+// DB QUERY FOR "VIEW ALL ROLES"
+
+db.query(`SELECT 
+role.id, title, name AS department, salary 
+FROM role
+JOIN department ON role.department_id = department.id
+ORDER BY role.id ASC`, (req, res) => {
+    console.table(res)
+});
+
+db.query(`SELECT 
+* 
+FROM role
+JOIN department ON role.department_id = department.id`, (req, res) => {
+    console.table(res)
+});
+
 db.query(`SELECT * FROM department`, (req, res) => {
     console.table(res)
 });

@@ -32,6 +32,11 @@ const nextActionQuestion = {
     ]
 }
 
+const newDepartmentQuestion = {};
+const newRoleQuestions = [];
+const newEmployeeQuestions = [];
+
+
 // NEXT STEP IS TO ADD IN CONSTRUCTORS AS OPTIONS FOR NEXTACTION.
 
 const Menu = () => {

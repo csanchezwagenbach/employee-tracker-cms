@@ -24,3 +24,17 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 });
 
+db.query(`SELECT * FROM employee`, (req, res) => {
+    console.table(res)
+});
+
+db.query(`SELECT * FROM role`, (req, res) => {
+    console.table(res)
+});
+
+db.query(`SELECT * FROM department`, (req, res) => {
+    console.table(res)
+});
+
+
+

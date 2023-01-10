@@ -1,5 +1,5 @@
-const express = require("express");
-const path = require("path");
+// const express = require("express");
+// const path = require("path");
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const table = require("console.table");
@@ -45,6 +45,7 @@ const Menu = () => {
                             JOIN department ON role.department_id = department.id
                             LEFT JOIN employee m ON m.id = e.manager_id 
                             ORDER BY e.id ASC`, (req, res) => {
+                            console.log("\n")
                             console.table(res)
                     });
                     Menu();
@@ -55,13 +56,14 @@ const Menu = () => {
                             FROM role
                             JOIN department ON role.department_id = department.id
                             ORDER BY role.id ASC`, (req, res) => {
+                            console.log("\n")
                             console.table(res)
                     });
                     Menu();
                     break;
                 case "View All Departments":
                     db.query(`SELECT * FROM department`, (req, res) => {
-                        console.log("All departments")
+                        console.log("\n")
                         console.table(res)
                     });
                     Menu();

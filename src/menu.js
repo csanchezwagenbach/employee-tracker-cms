@@ -41,8 +41,8 @@ const newEmployeeQuestions = [];
 
 // NEXT STEP IS TO ADD IN CONSTRUCTORS AS OPTIONS FOR NEXTACTION.
 
-const Menu = () => {
-    inquirer
+function Menu () {
+     inquirer
         .prompt
         (nextActionQuestion)
         .then((nextAction) => {
@@ -86,23 +86,17 @@ const Menu = () => {
                     Menu();
                     break;
                 case "Add A Department":
-                    inquirer
+                     inquirer
                         .prompt
                         (newDepartmentQuestion)
                         .then((newDepartment) => {
+                            console.log(newDepartment)
                             const {newDepartmentName} = newDepartment;
-                            db.query(`INSERT INTO department (name) VALUES (?)`, newDepartmentName, (err, result) => {
-                                if (err) {
-                                    res.status(400).json({ error: err.mesage });
-                                    return;
-                                }
-                                res.json({
-                                    message: "Successfully added a department",
-                                    data: body
-                                });
-                            });
+                            db.query(`INSERT INTO department (name) VALUES (?)`, newDepartmentName) 
+                        })
+                        .then((reload) => {
+                            Menu()
                         });
-                    Menu();
                     break;
                 default:
                     console.log("Landed at default")

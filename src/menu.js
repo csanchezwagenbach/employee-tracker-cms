@@ -24,8 +24,11 @@ const nextActionQuestion = {
     message: "What would you like to do?",
     choices: [
         "View All Employees",
+        "Add An Employee",
         "View All Roles",
-        "View All Departments"
+        "Add A Role",
+        "View All Departments",
+        "Add A Department"
     ]
 }
 
@@ -50,6 +53,9 @@ const Menu = () => {
                     });
                     Menu();
                     break;
+                case "Add An Employee":
+                    Menu();
+                    break;
                 case "View All Roles":
                     db.query(`SELECT 
                             role.id, title, name AS department, salary 
@@ -61,11 +67,17 @@ const Menu = () => {
                     });
                     Menu();
                     break;
+                case "Add A Role":
+                    Menu();
+                    break;
                 case "View All Departments":
                     db.query(`SELECT * FROM department`, (req, res) => {
                         console.log("\n")
                         console.table(res)
                     });
+                    Menu();
+                    break;
+                case "Add A Department":
                     Menu();
                     break;
                 default:

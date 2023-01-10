@@ -1,5 +1,3 @@
-// const express = require("express");
-// const path = require("path");
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const table = require("console.table");
@@ -32,7 +30,11 @@ const nextActionQuestion = {
     ]
 }
 
-const newDepartmentQuestion = {};
+const newDepartmentQuestion = {
+    type: "input",
+    name: "newDepartmentName",
+    message: "What is the name of the department?"
+};
 const newRoleQuestions = [];
 const newEmployeeQuestions = [];
 
@@ -59,6 +61,7 @@ const Menu = () => {
                     Menu();
                     break;
                 case "Add An Employee":
+                    
                     Menu();
                     break;
                 case "View All Roles":
@@ -83,6 +86,22 @@ const Menu = () => {
                     Menu();
                     break;
                 case "Add A Department":
+                    inquirer
+                        .prompt
+                        (newDepartmentQuestion)
+                        .then((newDepartment) => {
+                            const {newDepartmentName} = newDepartment;
+                            db.query(`INSERT INTO department (name) VALUES (?)`, newDepartmentName, (err, result) => {
+                                if (err) {
+                                    res.status(400).json({ error: err.mesage });
+                                    return;
+                                }
+                                res.json({
+                                    message: "Successfully added a department",
+                                    data: body
+                                });
+                            });
+                        });
                     Menu();
                     break;
                 default:

@@ -2,7 +2,6 @@ const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const table = require("console.table");
 
-const Department = require("../lib/Department");
 const Role = require("../lib/Role");
 const Employee = require("../lib/Employee");
 
@@ -35,10 +34,29 @@ const newDepartmentQuestion = {
     name: "newDepartmentName",
     message: "What is the name of the department?"
 };
-const newRoleQuestions = [];
+
+let departments;
+
+const newRoleQuestions = [
+    {
+        type: "input",
+        name: "title",
+        message: "What is the name of the role?"
+    },
+    {
+        type: "input",
+        name: "salary",
+        message: "What is the salary of the role?"
+    },
+    {
+        type: "list",
+        name: "department_id",
+        choices: departments
+    }
+];
 const newEmployeeQuestions = [];
 
-
+console.log(newRoleQuestions);
 // NEXT STEP IS TO ADD IN CONSTRUCTORS AS OPTIONS FOR NEXTACTION.
 
 function Menu () {
@@ -76,14 +94,20 @@ function Menu () {
                     Menu();
                     break;
                 case "Add A Role":
-                    Menu();
+                    db.query({ sql: `SELECT name  FROM department`, rowAsArray: true }, (err, results, fields) => {
+                        console.log("\n")
+                        console.log(results)
+                        console.log(fields)
+                    })
                     break;
                 case "View All Departments":
                     db.query(`SELECT * FROM department`, (req, res) => {
                         console.log("\n")
                         console.table(res)
+                    })
+                    .then((reload) => {
+                    Menu()
                     });
-                    Menu();
                     break;
                 case "Add A Department":
                      inquirer

@@ -126,15 +126,14 @@ function Menu() {
                                 .prompt
                                 (newRoleQuestions)
                         )
-                        .then((responses) => {
-                            console.log(responses)
-                            newRole.title = responses.title;
-                            newRole.salary = responses.salary;
-                        })
-                        // .then((role) => {
-                        //    const {title, salary} = role
-                        //    db.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [${title}, ${salary}, ${}])
-                        // })
+                        .then((newRole) => {
+                            console.log(newRole)
+                            const {title, salary, department_id} = newRole
+                            db.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [title, salary, department_id])
+                         })
+                         .then(() => {
+                            Menu()
+                         })
                     break;
                 case "View All Departments":
                     db.promise().query(`SELECT * FROM department`)

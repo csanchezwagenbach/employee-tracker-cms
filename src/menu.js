@@ -101,9 +101,10 @@ function Menu () {
                     })
                     break;
                 case "View All Departments":
-                    db.query(`SELECT * FROM department`, (req, res) => {
+                    db.promise().query(`SELECT * FROM department`)
+                    .then( ([rows, fields]) => {
                         console.log("\n")
-                        console.table(res)
+                        console.table(rows)
                     })
                     .then((reload) => {
                     Menu()

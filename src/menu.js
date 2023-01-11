@@ -35,9 +35,9 @@ const newDepartmentQuestion = {
     message: "What is the name of the department?"
 };
 
-let departments;
+let departments = [];
 
-const newRoleQuestions = [
+let newRoleQuestions = [
     {
         type: "input",
         name: "title",
@@ -50,17 +50,19 @@ const newRoleQuestions = [
     },
     {
         type: "list",
-        name: "department_id",
+        name: "department",
+        message: "What department does the role belong to?",
         choices: departments
     }
-];
+]
+
 const newEmployeeQuestions = [];
 
-console.log(newRoleQuestions);
+
 // NEXT STEP IS TO ADD IN CONSTRUCTORS AS OPTIONS FOR NEXTACTION.
 
-function Menu () {
-     inquirer
+function Menu() {
+    inquirer
         .prompt
         (nextActionQuestion)
         .then((nextAction) => {
@@ -73,13 +75,13 @@ function Menu () {
                             JOIN department ON role.department_id = department.id
                             LEFT JOIN employee m ON m.id = e.manager_id 
                             ORDER BY e.id ASC`, (req, res) => {
-                            console.log("\n")
-                            console.table(res)
+                        console.log("\n")
+                        console.table(res)
                     });
                     Menu();
                     break;
                 case "Add An Employee":
-                    
+
                     Menu();
                     break;
                 case "View All Roles":
@@ -88,36 +90,44 @@ function Menu () {
                             FROM role
                             JOIN department ON role.department_id = department.id
                             ORDER BY role.id ASC`, (req, res) => {
-                            console.log("\n")
-                            console.table(res)
+                        console.log("\n")
+                        console.table(res)
                     });
                     Menu();
                     break;
                 case "Add A Role":
-                    db.query({ sql: `SELECT name  FROM department`, rowAsArray: true }, (err, results, fields) => {
-                        console.log("\n")
-                        console.log(results)
-                        console.log(fields)
-                    })
+                    db.promise().query(`SELECT name FROM department`)
+                        .then((results) => {
+                            results[0].forEach(department => departments.push(department.name))
+                            console.log(departments)
+                        })
+                        .then((questions) => 
+                            inquirer
+                                .prompt
+                                (newRoleQuestions)
+                        )
+                        .then((responses) => {
+                            console.log(responses)
+                        })
                     break;
                 case "View All Departments":
                     db.promise().query(`SELECT * FROM department`)
-                    .then( ([rows, fields]) => {
-                        console.log("\n")
-                        console.table(rows)
-                    })
-                    .then((reload) => {
-                    Menu()
-                    });
+                        .then(([rows, fields]) => {
+                            console.log("\n")
+                            console.table(rows)
+                        })
+                        .then((reload) => {
+                            Menu()
+                        });
                     break;
                 case "Add A Department":
-                     inquirer
+                    inquirer
                         .prompt
                         (newDepartmentQuestion)
                         .then((newDepartment) => {
                             console.log(newDepartment)
-                            const {newDepartmentName} = newDepartment;
-                            db.query(`INSERT INTO department (name) VALUES (?)`, newDepartmentName) 
+                            const { newDepartmentName } = newDepartment;
+                            db.query(`INSERT INTO department (name) VALUES (?)`, newDepartmentName)
                         })
                         .then((reload) => {
                             Menu()

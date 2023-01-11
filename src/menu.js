@@ -15,6 +15,15 @@ const db = mysql.createConnection(
     console.log(`Connected to the company_db database.`)
 );
 
+let allDepartmentsObjects = [];
+let allRolesObjects = [];
+let allEmployeesObjects = [
+    {
+     name: "None",
+     value: null   
+    }
+];
+
 const nextActionQuestion = {
     type: "list",
     name: "choice",
@@ -35,17 +44,6 @@ const newDepartmentQuestion = {
     message: "What is the name of the department?"
 };
 
-
-
-let allDepartmentsObjects = [];
-let allRolesObjects = [];
-let allEmployeesObjects = [
-    {
-     name: "None",
-     value: null   
-    }
-];
-
 let newRoleQuestions = [
     {
         type: "input",
@@ -64,7 +62,6 @@ let newRoleQuestions = [
         choices: allDepartmentsObjects
     }
 ]
-
 
 const newEmployeeQuestions = [
     {
@@ -90,6 +87,7 @@ const newEmployeeQuestions = [
         choices: allEmployeesObjects
     }
 ];
+
 
 
 // NEXT STEP IS TO ADD IN CONSTRUCTORS AS OPTIONS FOR NEXTACTION.

@@ -112,11 +112,25 @@ function Menu() {
                     Menu();
                     break;
                 case "Add An Employee":
-                    db.promise().query(`SELECT * FROM department`)
-                        .then((results) => {
-                            console.log(results)
+                    db.promise().query(`SELECT * FROM role`)
+                        .then((roles) => {
+                            roles[0].forEach(role => {
+                                let roleObject = {
+                                    name: role.title,
+                                    value: role.id
+                                }
+                                allRolesObjects.push(roleObject)
+                            })
+                            console.log(allRolesObjects)
                         })
-                    Menu();
+                        .then(() => {
+                            db.query(`SELECT id, concat(first_name, " ", last_name) as full_name FROM employee`, (res) => {
+                                console.log(res)
+                            })
+                        })
+                        .then(() => { 
+                            Menu()
+                        })
                     break;
                 case "View All Roles":
                     db.query(`SELECT 

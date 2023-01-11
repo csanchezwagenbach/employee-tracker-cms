@@ -36,6 +36,11 @@ const newDepartmentQuestion = {
 };
 
 let departments = [];
+let departmentIDS = [];
+
+let allDepartmentsObjects = [
+   
+];
 
 let newRoleQuestions = [
     {
@@ -50,11 +55,17 @@ let newRoleQuestions = [
     },
     {
         type: "list",
-        name: "department",
+        name: "department_id",
         message: "What department does the role belong to?",
-        choices: departments
+        choices: allDepartmentsObjects
     }
 ]
+
+let newRole = {
+    title: "",
+    salary: "",
+    department_id: ""
+};
 
 const newEmployeeQuestions = [];
 
@@ -81,7 +92,10 @@ function Menu() {
                     Menu();
                     break;
                 case "Add An Employee":
-
+                    db.promise().query(`SELECT * FROM department`)
+                    .then((results) => {
+                        console.log(results)
+                    })
                     Menu();
                     break;
                 case "View All Roles":
@@ -96,10 +110,16 @@ function Menu() {
                     Menu();
                     break;
                 case "Add A Role":
-                    db.promise().query(`SELECT name FROM department`)
+                    db.promise().query(`SELECT * FROM department`)
                         .then((results) => {
-                            results[0].forEach(department => departments.push(department.name))
-                            console.log(departments)
+                            results[0].forEach(department => {
+                                let departmentObject = {
+                                    name: department.name,
+                                    value: department.id
+                                }
+                                allDepartmentsObjects.push(departmentObject)
+                            })
+                            console.log(allDepartmentsObjects)
                         })
                         .then((questions) => 
                             inquirer
@@ -108,7 +128,13 @@ function Menu() {
                         )
                         .then((responses) => {
                             console.log(responses)
+                            newRole.title = responses.title;
+                            newRole.salary = responses.salary;
                         })
+                        // .then((role) => {
+                        //    const {title, salary} = role
+                        //    db.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [${title}, ${salary}, ${}])
+                        // })
                     break;
                 case "View All Departments":
                     db.promise().query(`SELECT * FROM department`)

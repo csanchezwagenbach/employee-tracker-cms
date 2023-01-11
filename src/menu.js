@@ -121,11 +121,11 @@ function Menu() {
                                 }
                                 allRolesObjects.push(roleObject)
                             })
-                            console.log(allRolesObjects)
+                            // console.log(allRolesObjects)
                         })
                         .then(() => {
                             db.query(`SELECT id, concat(first_name, " ", last_name) as full_name FROM employee`, (req, employees) => {
-                                console.log(employees)
+                                // console.log(employees)
                                 employees.forEach(employee => {
                                     let employeeObject = {
                                         name: employee.full_name,
@@ -133,7 +133,7 @@ function Menu() {
                                     }
                                     allEmployeesObjects.push(employeeObject)
                                 })
-                                console.log(allEmployeesObjects)
+                                // console.log(allEmployeesObjects)
                             })
                             return allEmployeesObjects;
                         })
@@ -141,13 +141,14 @@ function Menu() {
                             inquirer
                                 .prompt
                                 (newEmployeeQuestions)
-                        })
-                        .then((newEmployeeDetails) => {
-                            console.log(newEmployeeDetails)
-                        })
-                        .then((done) => { 
-                            Menu()
-                        })
+                                .then((newEmployeeDetails) => {
+                                    const { first_name, last_name, role_id, manager_id } = newEmployeeDetails
+                                    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [first_name, last_name, role_id, manager_id])
+                                })
+                                .then(() => {
+                                    Menu();
+                                })
+                        })                       
                     break;
                 case "View All Roles":
                     db.query(`SELECT 

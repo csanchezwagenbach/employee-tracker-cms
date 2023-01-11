@@ -124,11 +124,28 @@ function Menu() {
                             console.log(allRolesObjects)
                         })
                         .then(() => {
-                            db.query(`SELECT id, concat(first_name, " ", last_name) as full_name FROM employee`, (res) => {
-                                console.log(res)
+                            db.query(`SELECT id, concat(first_name, " ", last_name) as full_name FROM employee`, (req, employees) => {
+                                console.log(employees)
+                                employees.forEach(employee => {
+                                    let employeeObject = {
+                                        name: employee.full_name,
+                                        value: employee.id
+                                    }
+                                    allEmployeesObjects.push(employeeObject)
+                                })
+                                console.log(allEmployeesObjects)
                             })
+                            return allEmployeesObjects;
                         })
-                        .then(() => { 
+                        .then((questionsReady) => {
+                            inquirer
+                                .prompt
+                                (newEmployeeQuestions)
+                        })
+                        .then((newEmployeeDetails) => {
+                            console.log(newEmployeeDetails)
+                        })
+                        .then((done) => { 
                             Menu()
                         })
                     break;
@@ -165,7 +182,7 @@ function Menu() {
                             const { title, salary, department_id } = newRole
                             db.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [title, salary, department_id])
                         })
-                        .then(() => {
+                        .then((done) => {
                             Menu()
                         })
                     break;

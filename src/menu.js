@@ -36,6 +36,7 @@ const nextActionQuestion = {
         "Add A Role",
         "View All Departments",
         "Add A Department",
+        "Quit The Program"
     ]
 }
 
@@ -104,8 +105,6 @@ const updateEmployeeRoleQuestions = [
     }
 ]
 
-
-// NEXT STEP IS TO ADD IN CONSTRUCTORS AS OPTIONS FOR NEXTACTION.
 
 function Menu() {
     inquirer
@@ -281,7 +280,9 @@ function Menu() {
                         });
                     break;
                 default:
-                    console.log("Landed at default")
+                    console.log("\n")
+                    console.log("Thank you for using our content management system. Goodbye!")
+                    return;
             }
         })
 }

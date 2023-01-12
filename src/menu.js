@@ -145,6 +145,7 @@ function Menu() {
                                 .then((newEmployeeDetails) => {
                                     const { first_name, last_name, role_id, manager_id } = newEmployeeDetails
                                     db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [first_name, last_name, role_id, manager_id])
+                                    console.log("Added " + first_name + " " + last_name + " to the database")
                                 })
                                 .then(() => {
                                     allRolesObjects = [];
@@ -178,7 +179,6 @@ function Menu() {
                                 }
                                 allDepartmentsObjects.push(departmentObject)
                             })
-                            console.log(allDepartmentsObjects)
                         })
                         .then((questions) =>
                             inquirer
@@ -186,9 +186,9 @@ function Menu() {
                                 (newRoleQuestions)
                         )
                         .then((newRole) => {
-                            console.log(newRole)
                             const { title, salary, department_id } = newRole
                             db.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [title, salary, department_id])
+                            console.log("Added " + title + " to the database")
                         })
                         .then((done) => {
                             Menu()
@@ -210,9 +210,9 @@ function Menu() {
                         .prompt
                         (newDepartmentQuestion)
                         .then((newDepartment) => {
-                            console.log(newDepartment)
                             const { newDepartmentName } = newDepartment;
                             db.query(`INSERT INTO department (name) VALUES (?)`, newDepartmentName)
+                            console.log("Added " + newDepartmentName + " to the database")
                         })
                         .then(() => {
                             Menu()

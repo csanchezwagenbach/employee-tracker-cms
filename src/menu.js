@@ -31,10 +31,11 @@ const nextActionQuestion = {
     choices: [
         "View All Employees",
         "Add An Employee",
+        "Update Employee Role",
         "View All Roles",
         "Add A Role",
         "View All Departments",
-        "Add A Department"
+        "Add A Department",
     ]
 }
 
@@ -88,6 +89,20 @@ const newEmployeeQuestions = [
     }
 ];
 
+const updateEmployeeRoleQuestions = [
+    {
+        type: "list",
+        name: "id",
+        message: "Which employee's role do you want to update?",
+        choices: allEmployeesObjects
+    },
+    {
+        type: "list",
+        name: "role_id",
+        message: "Which role do you want to assign the selected employee?",
+        choices: allRolesObjects
+    }
+]
 
 
 // NEXT STEP IS TO ADD IN CONSTRUCTORS AS OPTIONS FOR NEXTACTION.
@@ -111,9 +126,9 @@ function Menu() {
                             console.table(res[0])
                             console.log("\n")
                         });
-                        setTimeout(() => {
-                            Menu();
-                        }, 1000)
+                    setTimeout(() => {
+                        Menu();
+                    }, 1000)
                     break;
                 case "Add An Employee":
                     db.promise().query(`SELECT * FROM role`)
@@ -154,6 +169,49 @@ function Menu() {
                                 })
                         })
                     break;
+                case "Update Employee Role":
+                    db.promise().query(`SELECT * FROM role`)
+                        .then((roles) => {
+                            roles[0].forEach(role => {
+                                let roleObject = {
+                                    name: role.title,
+                                    value: role.id
+                                }
+                                allRolesObjects.push(roleObject)
+                            })
+                        })
+                        .then(() => {
+                            db.query(`SELECT id, concat(first_name, " ", last_name) as full_name FROM employee`, (req, employees) => {
+                                console.log(employees)
+                                employees.forEach(employee => {
+                                    console.log(employee)
+                                    let employeeObject = {
+                                        name: employee.full_name,
+                                        value: employee.id
+                                    }
+                                    allEmployeesObjects.push(employeeObject)
+                                })
+                            })
+                        })
+                        .then((questionsReady) => {
+                            inquirer
+                                .prompt
+                                (updateEmployeeRoleQuestions)
+                                .then((updatedEmployeeDetails) => {
+                                    console.log(updatedEmployeeDetails)
+                                    const { role_id, id} = updatedEmployeeDetails
+                                    db.query(`UPDATE employee
+                                    SET role_id = ?
+                                    WHERE id = ?`, [role_id, id])
+                                    console.log("Updated employee's role")
+                                })
+                                .then(() => {
+                                    allRolesObjects = [];
+                                    allEmployeesObjects = [];
+                                    Menu();
+                                })
+                        })
+                    break;
                 case "View All Roles":
                     db.promise().query(`SELECT 
                             role.id, title, name AS department, salary 
@@ -165,9 +223,9 @@ function Menu() {
                             console.table(res[0])
                             console.log("\n")
                         });
-                        setTimeout(() => {
-                            Menu();
-                        }, 1000)
+                    setTimeout(() => {
+                        Menu();
+                    }, 1000)
                     break;
                 case "Add A Role":
                     db.promise().query(`SELECT * FROM department`)

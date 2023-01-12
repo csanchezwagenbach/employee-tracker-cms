@@ -191,6 +191,7 @@ function Menu() {
                             console.log("Added " + title + " to the database")
                         })
                         .then((done) => {
+                            allDepartmentsObjects = [];
                             Menu()
                         })
                     break;

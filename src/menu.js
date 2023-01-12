@@ -376,6 +376,7 @@ function Menu() {
                                 allDepartmentsObjects = [];
                                 Menu()
                             })
+                    break;
                 default:
                     console.log("\n")
                     console.log("Thank you for using our content management system. Goodbye!")

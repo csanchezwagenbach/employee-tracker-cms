@@ -35,6 +35,7 @@ const nextActionQuestion = {
         "Update Employee Role",
         "View All Roles",
         "Add A Role",
+        "Delete A Role",
         "View All Departments",
         "Add A Department",
         "Quit The Program"
@@ -65,6 +66,13 @@ let newRoleQuestions = [
         choices: allDepartmentsObjects
     }
 ]
+
+const deleteRoleQuestion = {
+    type: "list",
+    name: "id",
+    message: "Which role would you like to delete?",
+    choices: allRolesObjects
+}
 
 const newEmployeeQuestions = [
     {
@@ -286,6 +294,31 @@ function Menu() {
                             allDepartmentsObjects = [];
                             Menu()
                         })
+                    break;
+                case "Delete A Role":
+                    db.promise().query(`SELECT id, title FROM role`)
+                    .then((roles) => {
+                        roles[0].forEach(role => {
+                            let roleObject = {
+                                name: role.title,
+                                value: role.id
+                            }
+                            allRolesObjects.push(roleObject)
+                        })
+                    })
+                    .then((questions) => 
+                        inquirer
+                            .prompt
+                            (deleteRoleQuestion)
+                            ).then((roleToDelete) => {
+                                const { id } = roleToDelete
+                                db.query(`DELETE FROM role WHERE id = ?`, id)
+                                console.log("Successfully deleted role from database")
+                            })
+                            .then((done) => {
+                                allRolesObjects = [];
+                                Menu()
+                            })
                     break;
                 case "View All Departments":
                     db.promise().query(`SELECT * FROM department`)

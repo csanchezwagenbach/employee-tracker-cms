@@ -38,6 +38,7 @@ const nextActionQuestion = {
         "Delete A Role",
         "View All Departments",
         "Add A Department",
+        "Delete A Department",
         "Quit The Program"
     ]
 }
@@ -47,6 +48,13 @@ const newDepartmentQuestion = {
     name: "newDepartmentName",
     message: "What is the name of the department?"
 };
+
+const deleteDepartmentQuestion = {
+    type: "list",
+    name: "id",
+    message: "Which department would you like to delete?",
+    choices: allDepartmentsObjects
+}
 
 let newRoleQuestions = [
     {
@@ -344,6 +352,30 @@ function Menu() {
                             Menu()
                         });
                     break;
+                case "Delete A Department":
+                    db.promise().query(`SELECT * FROM department`)
+                    .then((departments) => {
+                        departments[0].forEach(department => {
+                            let departmentObject = {
+                                name: department.name,
+                                value: department.id
+                            }
+                            allDepartmentsObjects.push(departmentObject)
+                        })
+                    })
+                    .then((questions) => 
+                        inquirer
+                            .prompt
+                            (deleteDepartmentQuestion)
+                            ).then((departmentToDelete) => {
+                                const { id } = departmentToDelete
+                                db.query(`DELETE FROM department WHERE id = ?`, id)
+                                console.log("Successfully deleted department from database")
+                            })
+                            .then((done) => {
+                                allDepartmentsObjects = [];
+                                Menu()
+                            })
                 default:
                     console.log("\n")
                     console.log("Thank you for using our content management system. Goodbye!")

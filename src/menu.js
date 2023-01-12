@@ -179,11 +179,12 @@ function Menu() {
                                 }
                                 allRolesObjects.push(roleObject)
                             })
+                            console.log(allRolesObjects)
                         })
                         .then(() => {
-                            db.query(`SELECT id, concat(first_name, " ", last_name) as full_name FROM employee`, (req, employees) => {
-                                console.log(employees)
-                                employees.forEach(employee => {
+                            db.promise().query(`SELECT id, concat(first_name, " ", last_name) as full_name FROM employee`)
+                            .then((employees) => {
+                                employees[0].forEach(employee => {
                                     console.log(employee)
                                     let employeeObject = {
                                         name: employee.full_name,
@@ -191,26 +192,28 @@ function Menu() {
                                     }
                                     allEmployeesObjects.push(employeeObject)
                                 })
+                                console.log(allEmployeesObjects)
+                            })
+                            .then((questionsReady) => {
+                                inquirer
+                                    .prompt
+                                    (updateEmployeeRoleQuestions)
+                                    .then((updatedEmployeeDetails) => {
+                                        console.log(updatedEmployeeDetails)
+                                        const { role_id, id} = updatedEmployeeDetails
+                                        db.query(`UPDATE employee
+                                        SET role_id = ?
+                                        WHERE id = ?`, [role_id, id])
+                                        console.log("Updated employee's role")
+                                    })
+                                    .then(() => {
+                                        allRolesObjects = [];
+                                        allEmployeesObjects = [];
+                                        Menu();
+                                    })
                             })
                         })
-                        .then((questionsReady) => {
-                            inquirer
-                                .prompt
-                                (updateEmployeeRoleQuestions)
-                                .then((updatedEmployeeDetails) => {
-                                    console.log(updatedEmployeeDetails)
-                                    const { role_id, id} = updatedEmployeeDetails
-                                    db.query(`UPDATE employee
-                                    SET role_id = ?
-                                    WHERE id = ?`, [role_id, id])
-                                    console.log("Updated employee's role")
-                                })
-                                .then(() => {
-                                    allRolesObjects = [];
-                                    allEmployeesObjects = [];
-                                    Menu();
-                                })
-                        })
+                        
                     break;
                 case "View All Roles":
                     db.promise().query(`SELECT 

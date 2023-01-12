@@ -19,8 +19,8 @@ let allDepartmentsObjects = [];
 let allRolesObjects = [];
 let allEmployeesObjects = [
     {
-     name: "None",
-     value: null   
+        name: "None",
+        value: null
     }
 ];
 
@@ -99,17 +99,21 @@ function Menu() {
         .then((nextAction) => {
             switch (nextAction.choice) {
                 case "View All Employees":
-                    db.query(`SELECT
+                    db.promise().query(`SELECT
                             e.id, e.first_name, e.last_name, title, name AS department, salary, concat(m.first_name, " ", m.last_name) AS manager
                             FROM employee e
                             INNER JOIN role ON e.role_id = role.id
                             JOIN department ON role.department_id = department.id
                             LEFT JOIN employee m ON m.id = e.manager_id 
-                            ORDER BY e.id ASC`, (req, res) => {
-                        console.log("\n")
-                        console.table(res)
-                    });
-                    Menu();
+                            ORDER BY e.id ASC`)
+                        .then((res) => {
+                            console.log("\n")
+                            console.table(res[0])
+                            console.log("\n")
+                        });
+                        setTimeout(() => {
+                            Menu();
+                        }, 1000)
                     break;
                 case "Add An Employee":
                     db.promise().query(`SELECT * FROM role`)
@@ -121,11 +125,9 @@ function Menu() {
                                 }
                                 allRolesObjects.push(roleObject)
                             })
-                            // console.log(allRolesObjects)
                         })
                         .then(() => {
                             db.query(`SELECT id, concat(first_name, " ", last_name) as full_name FROM employee`, (req, employees) => {
-                                // console.log(employees)
                                 employees.forEach(employee => {
                                     let employeeObject = {
                                         name: employee.full_name,
@@ -133,7 +135,6 @@ function Menu() {
                                     }
                                     allEmployeesObjects.push(employeeObject)
                                 })
-                                // console.log(allEmployeesObjects)
                             })
                             return allEmployeesObjects;
                         })
@@ -146,20 +147,26 @@ function Menu() {
                                     db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [first_name, last_name, role_id, manager_id])
                                 })
                                 .then(() => {
+                                    allRolesObjects = [];
+                                    allEmployeesObjects = [];
                                     Menu();
                                 })
-                        })                       
+                        })
                     break;
                 case "View All Roles":
-                    db.query(`SELECT 
+                    db.promise().query(`SELECT 
                             role.id, title, name AS department, salary 
                             FROM role
                             JOIN department ON role.department_id = department.id
-                            ORDER BY role.id ASC`, (req, res) => {
-                        console.log("\n")
-                        console.table(res)
-                    });
-                    Menu();
+                            ORDER BY role.id ASC`)
+                        .then((res) => {
+                            console.log("\n")
+                            console.table(res[0])
+                            console.log("\n")
+                        });
+                        setTimeout(() => {
+                            Menu();
+                        }, 1000)
                     break;
                 case "Add A Role":
                     db.promise().query(`SELECT * FROM department`)
@@ -192,10 +199,11 @@ function Menu() {
                         .then(([rows, fields]) => {
                             console.log("\n")
                             console.table(rows)
-                        })
-                        .then((reload) => {
-                            Menu()
+                            console.log("\n")
                         });
+                    setTimeout(() => {
+                        Menu();
+                    }, 1000)
                     break;
                 case "Add A Department":
                     inquirer

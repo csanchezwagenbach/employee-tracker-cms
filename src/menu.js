@@ -34,6 +34,7 @@ const nextActionQuestion = {
         "Add A Role",
         "Delete A Role",
         "View All Departments",
+        "View All Departments Total Utilized Budget",
         "Add A Department",
         "Delete A Department",
         "Quit The Program"
@@ -302,34 +303,46 @@ function Menu() {
                     break;
                 case "Delete A Role":
                     db.promise().query(`SELECT id, title FROM role`)
-                    .then((roles) => {
-                        roles[0].forEach(role => {
-                            let roleObject = {
-                                name: role.title,
-                                value: role.id
-                            }
-                            allRolesObjects.push(roleObject)
+                        .then((roles) => {
+                            roles[0].forEach(role => {
+                                let roleObject = {
+                                    name: role.title,
+                                    value: role.id
+                                }
+                                allRolesObjects.push(roleObject)
+                            })
                         })
-                    })
-                    .then((questions) => 
-                        inquirer
-                            .prompt
-                            (deleteRoleQuestion)
-                            ).then((roleToDelete) => {
-                                const { id } = roleToDelete
-                                db.query(`DELETE FROM role WHERE id = ?`, id)
-                                console.log("Successfully deleted role from database")
-                            })
-                            .then((done) => {
-                                allRolesObjects = [];
-                                Menu()
-                            })
+                        .then((questions) =>
+                            inquirer
+                                .prompt
+                                (deleteRoleQuestion)
+                        ).then((roleToDelete) => {
+                            const { id } = roleToDelete
+                            db.query(`DELETE FROM role WHERE id = ?`, id)
+                            console.log("Successfully deleted role from database")
+                        })
+                        .then((done) => {
+                            allRolesObjects = [];
+                            Menu()
+                        })
                     break;
                 case "View All Departments":
                     db.promise().query(`SELECT * FROM department`)
                         .then(([rows, fields]) => {
                             console.log("\n")
                             console.table(rows)
+                            console.log("\n")
+                        });
+                    setTimeout(() => {
+                        Menu();
+                    }, 1000)
+                    break;
+                case "View All Departments Total Utilized Budget":
+                    db.promise().query(`SELECT department.name as Department, SUM(salary) as "Total Utilized Budget" FROM role JOIN department ON role.department_id = department.id GROUP BY department_id 
+                    `)
+                    .then((res) => {
+                            console.log("\n")
+                            console.table(res[0])
                             console.log("\n")
                         });
                     setTimeout(() => {
@@ -351,33 +364,33 @@ function Menu() {
                     break;
                 case "Delete A Department":
                     db.promise().query(`SELECT * FROM department`)
-                    .then((departments) => {
-                        departments[0].forEach(department => {
-                            let departmentObject = {
-                                name: department.name,
-                                value: department.id
-                            }
-                            allDepartmentsObjects.push(departmentObject)
+                        .then((departments) => {
+                            departments[0].forEach(department => {
+                                let departmentObject = {
+                                    name: department.name,
+                                    value: department.id
+                                }
+                                allDepartmentsObjects.push(departmentObject)
+                            })
                         })
-                    })
-                    .then((questions) => 
-                        inquirer
-                            .prompt
-                            (deleteDepartmentQuestion)
-                            ).then((departmentToDelete) => {
-                                const { id } = departmentToDelete
-                                db.query(`DELETE FROM department WHERE id = ?`, id)
-                                console.log("Successfully deleted department from database")
-                            })
-                            .then((done) => {
-                                allDepartmentsObjects = [];
-                                Menu()
-                            })
+                        .then((questions) =>
+                            inquirer
+                                .prompt
+                                (deleteDepartmentQuestion)
+                        ).then((departmentToDelete) => {
+                            const { id } = departmentToDelete
+                            db.query(`DELETE FROM department WHERE id = ?`, id)
+                            console.log("Successfully deleted department from database")
+                        })
+                        .then((done) => {
+                            allDepartmentsObjects = [];
+                            Menu()
+                        })
                     break;
                 default:
                     console.log("\n")
                     console.log("Thank you for using our content management system. Goodbye!")
-                    return;
+                    process.exit(0);
             }
         })
 }

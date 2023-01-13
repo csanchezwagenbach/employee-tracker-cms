@@ -20,6 +20,7 @@ let allEmployeesObjects = [
         value: null
     }
 ];
+let allManagersObjects = [];
 
 const nextActionQuestion = {
     type: "list",
@@ -27,6 +28,7 @@ const nextActionQuestion = {
     message: "What would you like to do?",
     choices: [
         "View All Employees",
+        "View All Employees By Manager",
         "Add An Employee",
         "Delete An Employee",
         "Update Employee Role",
@@ -127,6 +129,13 @@ const updateEmployeeRoleQuestions = [
     }
 ]
 
+const viewEmployeesByManagerQuestion = {
+    type: "list",
+    name: "manager_id",
+    message: "Which manager's employees do you want to view?",
+    choices: allManagersObjects
+}
+
 
 function Menu() {
     inquirer
@@ -150,6 +159,18 @@ function Menu() {
                     setTimeout(() => {
                         Menu();
                     }, 1000)
+                    break;
+                case "View All Employees By Manager":
+                    db.promise().query(`SELECT
+                    e.id, e.first_name, e.last_name, title, name AS department, salary, concat(m.first_name, " ", m.last_name) AS manager
+                    FROM employee e
+                    INNER JOIN role ON e.role_id = role.id
+                    JOIN department ON role.department_id = department.id
+                    LEFT JOIN employee m ON m.id = e.manager_id 
+                    ORDER BY e.id ASC`)
+                    .then((res) => {
+                        // USE A SET CONSTRUCTOR TO CREATE A UNIQUE ARRAY OF MANAGER OBJECTS
+                    })
                     break;
                 case "Add An Employee":
                     db.promise().query(`SELECT * FROM role`)

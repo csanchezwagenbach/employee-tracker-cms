@@ -21,6 +21,10 @@ let allEmployeesObjects = [
     }
 ];
 let allManagersObjects = [];
+let allManagerNames = [];
+let allManagerIds = [];
+let finalManagerNames = [];
+let finalManagerIds = [];
 
 const nextActionQuestion = {
     type: "list",
@@ -161,15 +165,44 @@ function Menu() {
                     }, 1000)
                     break;
                 case "View All Employees By Manager":
-                    db.promise().query(`SELECT
-                    e.id, e.first_name, e.last_name, title, name AS department, salary, concat(m.first_name, " ", m.last_name) AS manager
+                    db.promise().query(`SELECT concat(m.first_name, " ", m.last_name) AS manager, m.id
                     FROM employee e
-                    INNER JOIN role ON e.role_id = role.id
-                    JOIN department ON role.department_id = department.id
                     LEFT JOIN employee m ON m.id = e.manager_id 
-                    ORDER BY e.id ASC`)
-                    .then((res) => {
+                    ORDER BY m.id ASC
+                    `)
+                    .then((managers) => {
                         // USE A SET CONSTRUCTOR TO CREATE A UNIQUE ARRAY OF MANAGER OBJECTS
+                        console.log(managers)
+                        managers[0].forEach(manager => {
+                            allManagerNames.push(manager.manager);
+                            allManagerIds.push(manager.id)
+                        })
+                        console.log(allManagerNames)
+                        console.log(allManagerIds)
+                        let managerNames = new Set(allManagerNames);
+                        let managerIds = new Set (allManagerIds)
+                        console.log(managerNames)
+                        console.log(managerIds)
+                        managerNames.delete(null)
+                        managerIds.delete(null)
+                        console.log(managerNames)
+                        console.log(managerIds)
+                        managerNames.forEach(name => {
+                            finalManagerNames.push(name)
+                        })
+                        console.log(finalManagerNames)
+                        managerIds.forEach(id => {
+                            finalManagerIds.push(id)
+                        })
+                        console.log(finalManagerIds)
+                        for (var i = 0; i < finalManagerNames.length; i++) {
+                            let managerObject = {
+                                name: finalManagerNames[i],
+                                value: finalManagerIds[i]
+                            }
+                            allManagersObjects.push(managerObject)
+                        }
+                        console.log(allManagersObjects)
                     })
                     break;
                 case "Add An Employee":

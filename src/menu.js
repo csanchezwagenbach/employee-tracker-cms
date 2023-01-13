@@ -170,40 +170,51 @@ function Menu() {
                     LEFT JOIN employee m ON m.id = e.manager_id 
                     ORDER BY m.id ASC
                     `)
-                    .then((managers) => {
-                        // USE A SET CONSTRUCTOR TO CREATE A UNIQUE ARRAY OF MANAGER OBJECTS
-                        console.log(managers)
-                        managers[0].forEach(manager => {
-                            allManagerNames.push(manager.manager);
-                            allManagerIds.push(manager.id)
-                        })
-                        console.log(allManagerNames)
-                        console.log(allManagerIds)
-                        let managerNames = new Set(allManagerNames);
-                        let managerIds = new Set (allManagerIds)
-                        console.log(managerNames)
-                        console.log(managerIds)
-                        managerNames.delete(null)
-                        managerIds.delete(null)
-                        console.log(managerNames)
-                        console.log(managerIds)
-                        managerNames.forEach(name => {
-                            finalManagerNames.push(name)
-                        })
-                        console.log(finalManagerNames)
-                        managerIds.forEach(id => {
-                            finalManagerIds.push(id)
-                        })
-                        console.log(finalManagerIds)
-                        for (var i = 0; i < finalManagerNames.length; i++) {
-                            let managerObject = {
-                                name: finalManagerNames[i],
-                                value: finalManagerIds[i]
+                        .then((managers) => {
+                            managers[0].forEach(manager => {
+                                allManagerNames.push(manager.manager);
+                                allManagerIds.push(manager.id)
+                            })
+                            let managerNames = new Set(allManagerNames);
+                            let managerIds = new Set(allManagerIds)
+                            managerNames.delete(null)
+                            managerIds.delete(null)
+                            managerNames.forEach(name => {
+                                finalManagerNames.push(name)
+                            })
+                            managerIds.forEach(id => {
+                                finalManagerIds.push(id)
+                            })
+                            for (var i = 0; i < finalManagerNames.length; i++) {
+                                let managerObject = {
+                                    name: finalManagerNames[i],
+                                    value: finalManagerIds[i]
+                                }
+                                allManagersObjects.push(managerObject)
                             }
-                            allManagersObjects.push(managerObject)
-                        }
-                        console.log(allManagersObjects)
-                    })
+                        })
+                        .then(() => {
+                            inquirer
+                                .prompt
+                                (viewEmployeesByManagerQuestion)
+                                .then((manager) => {
+                                    const { manager_id } = manager
+                                    db.promise().query(`SELECT concat(first_name, " ", last_name) as employees FROM employee WHERE manager_id = ?`, manager_id)
+                                        .then((employees) => {
+                                            console.log("\n")
+                                            console.table(employees[0])
+                                            console.log("\n")
+                                            allManagerNames = [];
+                                            allManagerIds = [];
+                                            allManagersObjects = [];
+                                        })
+                                })
+                                .then(() => {
+                                    setTimeout(() => {
+                                        Menu();
+                                    }, 1000)
+                                })
+                        })
                     break;
                 case "Add An Employee":
                     db.promise().query(`SELECT * FROM role`)
@@ -394,7 +405,7 @@ function Menu() {
                 case "View All Departments Total Utilized Budget":
                     db.promise().query(`SELECT department.name as Department, SUM(salary) as "Total Utilized Budget" FROM role JOIN department ON role.department_id = department.id GROUP BY department_id 
                     `)
-                    .then((res) => {
+                        .then((res) => {
                             console.log("\n")
                             console.table(res[0])
                             console.log("\n")

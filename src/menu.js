@@ -37,6 +37,7 @@ const nextActionQuestion = {
         "Add An Employee",
         "Delete An Employee",
         "Update Employee Role",
+        "Update Employee Manager",
         "View All Roles",
         "Add A Role",
         "Delete A Role",
@@ -131,6 +132,21 @@ const updateEmployeeRoleQuestions = [
         name: "role_id",
         message: "Which role do you want to assign the selected employee?",
         choices: allRolesObjects
+    }
+]
+
+const updateEmployeeManagerQuestions = [
+    {
+        type: "list",
+        name: "id",
+        message: "Which employee's manager would you like to update?",
+        choices: allEmployeesObjects
+    },
+    {
+        type: "list",
+        name: "manager_id",
+        message: "Who would you like to assign as this employee's manager?",
+        choices: allEmployeesObjects
     }
 ]
 
@@ -241,30 +257,30 @@ function Menu() {
                                 (viewEmployeesByDepartmentQuestion)
                                 .then((department) => {
                                     let departmentToView = department.department_id
-                                            db.promise().query(`SELECT concat(first_name, " ", last_name) as Employees, department_id, title as Roles FROM employee
+                                    db.promise().query(`SELECT concat(first_name, " ", last_name) as Employees, department_id, title as Roles FROM employee
                                     JOIN role on role.id = employee.role_id
                                     JOIN department on department.id = role.department_id`)
-                                                .then((allEmployees) => {
-                                                    let employeesByDepartment = [];
-                                                    allEmployees[0].forEach(employee => {
-                                                        if (employee.department_id === departmentToView) {
-                                                            let employeeDeptObject = {
-                                                                name: employee.Employees,
-                                                                role: employee.Roles
-                                                            }
-                                                            employeesByDepartment.push(employeeDeptObject)
-                                                        }
-                                                    })
-                                                    console.log("\n")
-                                                    console.table(employeesByDepartment)
-                                                    console.log("\n")
-                                                })
-                                                .then(() => {
-                                                    allDepartmentsObjects = [];
-                                                    Menu();
-                                                })
+                                        .then((allEmployees) => {
+                                            let employeesByDepartment = [];
+                                            allEmployees[0].forEach(employee => {
+                                                if (employee.department_id === departmentToView) {
+                                                    let employeeDeptObject = {
+                                                        name: employee.Employees,
+                                                        role: employee.Roles
+                                                    }
+                                                    employeesByDepartment.push(employeeDeptObject)
+                                                }
+                                            })
+                                            console.log("\n")
+                                            console.table(employeesByDepartment)
+                                            console.log("\n")
+                                        })
+                                        .then(() => {
+                                            allDepartmentsObjects = [];
+                                            Menu();
                                         })
                                 })
+                        })
                     break;
                 case "Add An Employee":
                     db.promise().query(`SELECT * FROM role`)
@@ -374,6 +390,36 @@ function Menu() {
                                 })
                         })
 
+                    break;
+                case "Update Employee Manager":
+                    db.promise().query(`SELECT id, concat(first_name, " ", last_name) as Name FROM employee`)
+                    .then((employees) => {
+                        employees[0].forEach(employee => {
+                            let employeeObject = {
+                                name: employee.Name,
+                                value:employee.id
+                            }
+                            allEmployeesObjects.push(employeeObject)
+                        })                        
+                    })
+                    .then(() => {
+                        inquirer
+                            .prompt
+                            (updateEmployeeManagerQuestions)
+                            .then((updateDetails) => {
+                                const { id, manager_id} = updateDetails
+                                if (id === null) {
+                                    return;
+                                } else {
+                                    db.query(`UPDATE employee SET manager_id = ? WHERE id = ?`, [manager_id, id])
+                                    console.log("Updated employee's manager")
+                                }
+                            })
+                            .then(() => {
+                                allEmployeesObjects = [];
+                                Menu();
+                            })
+                    })     
                     break;
                 case "View All Roles":
                     db.promise().query(`SELECT 

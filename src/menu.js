@@ -332,7 +332,6 @@ function Menu() {
                     db.promise().query(`SELECT id, concat(first_name, " ", last_name) AS name FROM employee`)
                         .then((employees) => {
                             employees[0].forEach(employee => {
-                                console.log(employee)
                                 let employeeObject = {
                                     name: employee.name,
                                     value: employee.id
@@ -362,27 +361,23 @@ function Menu() {
                                 }
                                 allRolesObjects.push(roleObject)
                             })
-                            console.log(allRolesObjects)
                         })
                         .then(() => {
                             db.promise().query(`SELECT id, concat(first_name, " ", last_name) as full_name FROM employee`)
                                 .then((employees) => {
                                     employees[0].forEach(employee => {
-                                        console.log(employee)
                                         let employeeObject = {
                                             name: employee.full_name,
                                             value: employee.id
                                         }
                                         allEmployeesObjects.push(employeeObject)
                                     })
-                                    console.log(allEmployeesObjects)
                                 })
                                 .then((questionsReady) => {
                                     inquirer
                                         .prompt
                                         (updateEmployeeRoleQuestions)
                                         .then((updatedEmployeeDetails) => {
-                                            console.log(updatedEmployeeDetails)
                                             const { role_id, id } = updatedEmployeeDetails
                                             db.query(`UPDATE employee
                                         SET role_id = ?

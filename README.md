@@ -14,7 +14,10 @@ This employee-tracker serves as a sample Content Management System (CMS) for a g
 To run the application users must first download NodeJS. A step by step guide to download NodeJS onto your machine may be found [here.](https://coding-boot-camp.github.io/full-stack/nodejs/how-to-install-nodejs)
 
 ## Usage
-Watch the video below for a live demonstration of the application's functionality. 
+Users may simply and intuitively create, read, update, and delete data, all from an easy-to-use menu. Watch the video below for a live demonstration of the application's functionality.
+
+[Live Demonstration Video](https://watch.screencastify.com/v/9y6mL12ONbkJYzuN2TIR)
+
   
 ## Badges
 ![MIT](https://img.shields.io/badge/License-MIT-yellow.svg)

@@ -42,7 +42,7 @@ const nextActionQuestion = {
         "Add A Role",
         "Delete A Role",
         "View All Departments",
-        "View All Departments Total Utilized Budget",
+        "View A Department's Total Utilized Budget",
         "Add A Department",
         "Delete A Department",
         "Quit The Program"
@@ -149,6 +149,13 @@ const updateEmployeeManagerQuestions = [
         choices: allEmployeesObjects
     }
 ]
+
+const viewDepartmentBudgetQuestion = {
+    type: "list",
+    name: "department_id",
+    message: "Which department's total utilized budget would you like to view?",
+    choices: allDepartmentsObjects
+}
 
 const viewEmployeesByManagerQuestion = {
     type: "list",
@@ -393,33 +400,33 @@ function Menu() {
                     break;
                 case "Update Employee Manager":
                     db.promise().query(`SELECT id, concat(first_name, " ", last_name) as Name FROM employee`)
-                    .then((employees) => {
-                        employees[0].forEach(employee => {
-                            let employeeObject = {
-                                name: employee.Name,
-                                value:employee.id
-                            }
-                            allEmployeesObjects.push(employeeObject)
-                        })                        
-                    })
-                    .then(() => {
-                        inquirer
-                            .prompt
-                            (updateEmployeeManagerQuestions)
-                            .then((updateDetails) => {
-                                const { id, manager_id} = updateDetails
-                                if (id === null) {
-                                    return;
-                                } else {
-                                    db.query(`UPDATE employee SET manager_id = ? WHERE id = ?`, [manager_id, id])
-                                    console.log("Updated employee's manager")
+                        .then((employees) => {
+                            employees[0].forEach(employee => {
+                                let employeeObject = {
+                                    name: employee.Name,
+                                    value: employee.id
                                 }
+                                allEmployeesObjects.push(employeeObject)
                             })
-                            .then(() => {
-                                allEmployeesObjects = [];
-                                Menu();
-                            })
-                    })     
+                        })
+                        .then(() => {
+                            inquirer
+                                .prompt
+                                (updateEmployeeManagerQuestions)
+                                .then((updateDetails) => {
+                                    const { id, manager_id } = updateDetails
+                                    if (id === null) {
+                                        return;
+                                    } else {
+                                        db.query(`UPDATE employee SET manager_id = ? WHERE id = ?`, [manager_id, id])
+                                        console.log("Updated employee's manager")
+                                    }
+                                })
+                                .then(() => {
+                                    allEmployeesObjects = [];
+                                    Menu();
+                                })
+                        })
                     break;
                 case "View All Roles":
                     db.promise().query(`SELECT 
@@ -498,17 +505,60 @@ function Menu() {
                         Menu();
                     }, 1000)
                     break;
-                case "View All Departments Total Utilized Budget":
-                    db.promise().query(`SELECT department.name as Department, SUM(salary) as "Total Utilized Budget" FROM role JOIN department ON role.department_id = department.id GROUP BY department_id 
+                case "View A Department's Total Utilized Budget":
+                    db.promise().query(`SELECT * FROM department 
                     `)
-                        .then((res) => {
-                            console.log("\n")
-                            console.table(res[0])
-                            console.log("\n")
-                        });
-                    setTimeout(() => {
-                        Menu();
-                    }, 1000)
+                        .then((departments) => {
+                            departments[0].forEach(department => {
+                                let departmentObject = {
+                                    name: department.name,
+                                    value: department.id
+                                }
+                                allDepartmentsObjects.push(departmentObject)
+                            })
+                        })
+                        .then(() => {
+                            inquirer
+                                .prompt
+                                (viewDepartmentBudgetQuestion)
+                                .then((department) => {
+                                    let desiredDepartment = department.department_id
+                                    db.query(`SELECT salary, department_id, name as Department FROM employee
+                                    JOIN role on role.id = employee.role_id
+                                    JOIN department on department.id = role.department_id ORDER BY department_id ASC`, (err, res) => {
+                                        let salariesToSum = [];
+                                        res.forEach(employee => {
+                                            if (employee.department_id === desiredDepartment) {
+                                                salariesToSum.push(employee)
+                                            }
+                                        })
+                                        let utilizedBudget = 0;
+                                        salariesToSum.forEach(role => {
+                                            utilizedBudget += parseInt(role.salary)
+                                        })
+                                        if (!salariesToSum[0]) {
+                                            console.log("This department does not currently have an allotted budget!")
+                                            setTimeout(() => {
+                                                allDepartmentsObjects = [];
+                                                Menu();
+                                            }, 1000)
+                                        } else {
+                                            let totalUtilizedBudget = {
+                                                Department: salariesToSum[0].Department,
+                                                Budget: utilizedBudget
+                                            }
+                                            let budgetInArray = [totalUtilizedBudget]
+                                            console.log("\n")
+                                            console.table(budgetInArray)
+                                            setTimeout(() => {
+                                                allDepartmentsObjects = [];
+                                                Menu();
+                                            }, 1000)
+                                        }
+                                    })
+                                })
+                        })
+                
                     break;
                 case "Add A Department":
                     inquirer

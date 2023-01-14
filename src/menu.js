@@ -12,6 +12,8 @@ const db = mysql.createConnection(
     console.log(`Connected to the company_db database.`)
 );
 
+// Below are a series of empty arrays, question objects, and question arrays. Each of these is predefined globally for the purpose of passing them into the Inquirer.prompt() method in the Menu() function below. The empty arrays served the purpose of holding data received from queries to the database for the purpose of manipulating what was to be sent or what was returned. 
+
 let allDepartmentsObjects = [];
 let allRolesObjects = [];
 let allEmployeesObjects = [
@@ -171,6 +173,7 @@ const viewEmployeesByDepartmentQuestion = {
     choices: allDepartmentsObjects
 }
 
+// Menu() is a callback function that runs the program within it. Utilizing a switch statement tied to a user's next desired action, the function guides a user to the appropriate queries. For the most part, each function demanded unique multiple queries in order to generate the desired data and print it in the desired format. I utilized a series of promises, and while I realized after beginning that asynchronous functions with await statements might have made the code more legible and simple to write, I decided to see through to the end my Matryoshka doll of promises. 
 
 function Menu() {
     inquirer
@@ -553,7 +556,7 @@ function Menu() {
                                     })
                                 })
                         })
-                
+
                     break;
                 case "Add A Department":
                     inquirer
